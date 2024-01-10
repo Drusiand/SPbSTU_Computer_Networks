@@ -1,0 +1,190 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+\usepackage{placeins}
+\usepackage{cmap} % для кодировки шрифтов в pdf
+\usepackage[T1]{fontenc}
+\usepackage{hhline}
+\usepackage[unicode]{hyperref}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{textcomp}
+\usepackage[russian]{babel}
+\usepackage{graphicx} % для вставки картинок
+\usepackage{amssymb,amsfonts,amsmath,amsthm} % математические дополнения от АМС
+\usepackage{indentfirst} % отделять первую строку раздела абзацным отступом тоже
+% Поля
+\usepackage{geometry}
+\geometry{left=2cm}
+\geometry{right=1.5cm}
+\geometry{top=2.4cm}
+\geometry{bottom=2.cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%     
+
+\linespread{1.5} % полуторный интервал
+\frenchspacing
+
+
+
+
+\begin{document}
+	
+	\begin{titlepage}
+		
+		\begin{center}
+			\begin{large}
+				Санкт-Петербургский Политехнический университет\\ Петра Великого\\
+				Физико-механический институт\\
+			\end{large}
+			\vspace{0.2cm}
+			Высшая школа прикладной математики и вычислительной физики\\
+			
+		\end{center}
+		
+		\vspace{3cm}
+		\begin{center}
+			\textbf{Отчёт\\ по лабораторной работе №3\\ по дисциплине\\ "Компьютерные сети"}
+		\end{center}
+		
+		\vspace{3cm}
+		
+		\vbox{%
+			\hfill%
+			\vbox{%
+				\hbox{Выполнил студент:}%
+				\hbox{\break}
+				\hbox{Иванов Андрей Игоревич,}%
+				\hbox{группа 5040102$\backslash$20201}%
+				\hbox{\break}
+				\hbox{\break}
+				\hbox{Проверил:}
+				\hbox{\break}
+				\hbox{к.ф.-м.н., доцент}
+				\hbox{Баженов Александр Николаевич}
+			}%
+		} 
+		\vfill
+		
+		\begin{center}
+			Санкт-Петербург, 2024
+		\end{center}
+	
+	\end{titlepage}
+	\tableofcontents
+	\newpage
+		
+	\section{Постановка задачи}
+        Требуется реализовать алгоритм, позволяющий обрабатывать неисправные компоненты компьютерной системы, которые передают противоречивую информацию в разные части этой системы. Исторически эта задача известна как "Задача византийский генералов".\newline \newline
+        Вокруг вражеского города расположены лагеря групп генералов византийской армии со своими войсками. Общаясь только посредством гонца, генералы должны согласовать общий план сражения (атаковать или отступать). Однако один или несколько из них могут оказаться предателями, которые попытаются сбить с толку остальных. Задача состоит в поиске алгоритма, гарантирующий, что лояльные генералы придут к соглашению.
+	\newpage
+	
+	\section{Теория}
+            В 1982 году Лэсли Лэмпорт предложил следующее алгоритм решения данной задачи.
+            Он показывает, что при использовании устных сообщений ("АТАКА"\ и "ОТСТУПЛЕНИЕ"\ ) эта проблема разрешима тогда и только тогда, когда более двух третей генералов лояльны.
+
+            Алгоритм Лэмпорта выглядит следующим образом (m - уровень рекурсии/количество предателей, "командир"\ - генерал-отправитель, "лейтенант"\ - генерал-получатель):
+            
+            \subsection{Алгоритм OM(0) (базовый вариант)}
+            \begin{enumerate}
+                \item Командир отправляет свое сообщение каждому лейтенанту.
+                \item Каждый лейтенант принимает сообщение, которое он получает от командира, или принимает сообщение "ОТСТУПЛЕНИЕ"\ ,  если он не получает никакого сообщения.
+            \end{enumerate}
+            
+            \subsection{Алгоритм OM(m), m > O.}
+            \begin{enumerate}
+                \item Командир отправляет свое сообщение каждому лейтенанту.
+                \item Для каждого $i$ пусть $v[i]$ - сообщение, которое i-ый генерал получает от командира, или же "ОТСТУПЛЕНИЕ"\ , если он не получает никакого сообщения. i-ый генерал действует как командир в алгоритме OM(m - 1), отправляя значение $v[i]$ каждому из N - 2 других лейтенантов.
+                \item Для каждого $i$ и каждого $j \neq i$ пусть $v[j]$ будет сообщением, полученным i-ым генералом от j-ого генерала на предыдущем шаге (используя алгоритм OM(m - 1)), или же "ОТСТУПЛЕНИЕ"\ , если он не получил такого сообщения. В общем случае i-ый генерал принимает наиболее часто встречающееся значение (v[0].....v[N]).
+            \end{enumerate}
+            
+            
+	\newpage
+	
+	\section{Реализация}
+		Лабораторная работа выполнена на языке Python 3.10 с помощью инструментов стандартной библиотеки. Исходный код лабораторной работы находится на \href{https://github.com/Drusiand/SPbSTU_Computer_Networks.git}{GitHub репозитории}.
+	\newpage
+	
+	\section{Результаты}  
+            Пусть войсками командуют 10 генералов и был отдан пркиказ "АТАКА". Рассмотрим несколько конфигураций предателей:
+            \subsection{0 предателей, m = 0}
+                \begin{center}
+                    \begin{tabular}{|c|c|}
+                        \hline
+                        General 0 & ('ATTACK', 1) \\ \hline
+                        General 1 & ('ATTACK', 1) \\ \hline
+                        General 2 & ('ATTACK', 1) \\ \hline
+                        General 3 & ('ATTACK', 1) \\ \hline
+                        General 4 & ('ATTACK', 1) \\ \hline
+                        General 5 & ('ATTACK', 1) \\ \hline
+                        General 6 & ('ATTACK', 1) \\ \hline
+                        General 7 & ('ATTACK', 1) \\ \hline
+                        General 8 & ('ATTACK', 1) \\ \hline
+                        General 9 & ('ATTACK', 1) \\ \hline
+                    \end{tabular}
+                \end{center}
+                В случае полностью лояльного войска каждый из генералов получает ровно по одному приказу к атаке, соответственно все генералы смогли договориться.
+                
+            \subsection{1 предатель (генерал с индексом 2), m = 1}
+                \begin{center}
+                    \begin{tabular}{|c|c|c|}
+                        \hline
+                        General 0 & ('ATTACK', 8) & ('RETREAT', 1) \\ \hline
+                        General 1 & ('ATTACK', 9) & - \\ \hline
+                        General 2 & ('ATTACK', 8) & ('RETREAT', 1) \\ \hline
+                        General 3 & ('ATTACK', 9) & - \\ \hline
+                        General 4 & ('ATTACK', 8) & ('RETREAT', 1) \\ \hline
+                        General 5 & ('ATTACK', 9) & - \\ \hline
+                        General 6 & ('ATTACK', 8) & ('RETREAT', 1) \\ \hline
+                        General 7 & ('ATTACK', 9) & - \\ \hline
+                        General 8 & ('ATTACK', 8) & ('RETREAT', 1) \\ \hline
+                        General 9 & ('ATTACK', 9) & - \\ \hline
+                    \end{tabular}
+            \end{center}
+            В случае c одним предателем войску по-пержнему удается договриться об общем решении, каждый из генералов получил 8 или 9 сообщений об атаке и максимум одно обратное.
+
+            \subsection{3 предателя (генералы с индексами 2, 5, 9), m = 3}
+                \begin{center}
+                    \begin{tabular}{|c|c|c|}
+                        \hline
+                        General 0 & ('ATTACK', 303) & ('RETREAT', 273) \\ \hline
+                        General 1 & ('ATTACK', 403) & ('RETREAT', 173) \\ \hline
+                        General 2 & ('ATTACK', 303) & ('RETREAT', 273) \\ \hline
+                        General 3 & ('ATTACK', 403) & ('RETREAT', 173) \\ \hline
+                        General 4 & ('ATTACK', 303) & ('RETREAT', 273) \\ \hline
+                        General 5 & ('ATTACK', 403) & ('RETREAT', 173) \\ \hline
+                        General 6 & ('ATTACK', 303) & ('RETREAT', 273) \\ \hline
+                        General 7 & ('ATTACK', 403) & ('RETREAT', 173) \\ \hline
+                        General 8 & ('ATTACK', 303) & ('RETREAT', 273) \\ \hline
+                        General 9 & ('ATTACK', 403) & ('RETREAT', 173) \\ \hline
+                    \end{tabular}
+            \end{center}
+            В случае c тремя предателем войску по-пержнему удается договриться об общем решении, однако количество сообщений от предателей заметно увеличилось. Тем не менее, количество правдивых сообщений остается в большинстве. Данный случай (7 лояльных и 3 предателя) является краевым, так как не существует решения, если количество предателей строго превышает $\frac{2}{3}$ общего числа генералов.
+
+            \subsection{4 предателя (генералы с индексами 2, 5, 8, 9), m = 4}
+                \begin{center}
+                    \begin{tabular}{|c|c|c|}
+                        \hline
+                        General 0 & ('RETREAT', 2326) & ('ATTACK', 2282) \\ \hline
+                        General 1 & ('ATTACK', 2630)  & ('RETREAT', 1978)\\ \hline
+                        General 2 & ('RETREAT', 2326) & ('ATTACK', 2282) \\ \hline
+                        General 3 & ('ATTACK', 2630)  & ('RETREAT', 1978)\\ \hline
+                        General 4 & ('RETREAT', 2326) & ('ATTACK', 2282) \\ \hline
+                        General 5 & ('ATTACK', 2630)  & ('RETREAT', 1978)\\ \hline
+                        General 6 & ('RETREAT', 2326) & ('ATTACK', 2282) \\ \hline
+                        General 7 & ('ATTACK', 2630)  & ('RETREAT', 1978)\\ \hline
+                        General 8 & ('RETREAT', 2326) & ('ATTACK', 2282) \\ \hline
+                        General 9 & ('ATTACK', 2630)  & ('RETREAT', 1978)\\ \hline
+                    \end{tabular}
+            \end{center}
+            В случае c четырьмя предателем наблюдается разрозненность значений, решения не существует.
+            
+        \clearpage
+	\newpage
+
+\end{document}
